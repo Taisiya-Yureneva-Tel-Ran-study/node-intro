@@ -1,0 +1,23 @@
+{
+  "name": "intro",
+  "version": "1.0.0",
+  "description": "Intro for node dev",
+  "license": "ISC",
+  "author": "Yurta",
+  "type": "module",
+  "main": "index.ts",
+  "scripts": {
+    "dev": "node --no-warnings --loader ts-node/esm index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.20",
+    "@types/node": "^24.0.12",
+    "ts-node": "^10.9.2",
+    "tslib": "^2.8.1",
+    "typescript": "^5.8.3"
+  }
+}
