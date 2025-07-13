@@ -1,47 +1,58 @@
 import _ from 'lodash';
 
-let count: number = 7;
-let min: number = 1;
-let max: number = 49;
+let numCount: number = 7;
+let minNum: number = 1;
+let maxNum: number = 49;
+
+function checkArgs() {
+    if (argv.length > 2 && argv.length < 5) {
+        console.log("Invalid number of arguments. To use default values, run the script without arguments.\nTo use custom value specify 3 arguments: count, min value and max value.");
+        process.exit(1);
+    }
+
+    if (argv[2] && !Number.isNaN(Number(argv[2]))) numCount = Number(argv[2]);
+    if (argv[3] && !Number.isNaN(Number(argv[3]))) minNum = Number(argv[3]);
+    if (argv[4] && !Number.isNaN(Number(argv[4]))) maxNum = Number(argv[4]);
+
+    if (numCount < 1) {
+        console.log("Warning: count should be greater than 0\n");
+        process.exit(1);
+    }
+
+    if (minNum >= maxNum) {
+        console.log("Warning: min value should be less than max value\n");
+        process.exit(1);
+    }
+    if (numCount > maxNum - minNum + 1) {
+        console.log("Warning: cannot select", numCount, "unique numbers between", minNum, "and", maxNum, "\n");
+        process.exit(1);
+    }
+}
+
+function getNumbersFromAI(count: number, min: number, max: number): number[] {
+    let nums: number[] = _.range(min, max);
+    nums = _.shuffle(nums);
+    return nums.slice(0, count);
+}
+
+function getNumbers(count: number, min: number, max: number): number[] {
+    let nums: number[] = [];
+
+    while (nums.length < count) {
+        const a = _.random(min, max);
+        if (!nums.includes(a)) nums.push(a);
+    }
+    return nums;
+}
 
 const argv = process.argv;
 
-console.log("=== Loto imitator ===\n");
+console.log("=== Loto numbers selector ===\n");
 
-if (argv.length > 2 && argv.length < 5) {
-    console.log("Invalid number of arguments. To use default values, run the script without arguments.\nTo use custom value specify 3 arguments: count, min value and max value.");
-    process.exit(1);
-}
+checkArgs();
 
-if (argv[2] && !Number.isNaN(Number(argv[2]))) count = Number(argv[2]);
-if (argv[3] && !Number.isNaN(Number(argv[3]))) min = Number(argv[3]);
-if (argv[4] && !Number.isNaN(Number(argv[4]))) max = Number(argv[4]);
+console.log(">>> Draw ", numCount, " of ", maxNum - minNum + 1, "<<<\n");
 
-if (min >= max) {
-    console.log("Warning: min value should be less than max\n");
-    process.exit(1);
-}
-if (count > max - min + 1) {
-    console.log("Warning: cannot select", count, "unique numbers between", min, "and", max, "\n");
-    process.exit(1);
-}
+console.log(">>> AI numbers:", getNumbersFromAI(numCount, minNum, maxNum), "<<<\n");
 
-console.log(">>> Draw ", count, " of ", max - min + 1, "<<<\n");
-
-// A solution suggested by AI - it was too fast and nice, I did not have a chance to reject it...
-let num: number[] = _.range(min, max );
-
-num = _.shuffle(num);
-num = num.slice(0, count);
-
-console.log(">>> Numbers:", num);
-
-// And below is my solution
-let otherNums: number[] = [];
-
-while (otherNums.length < count) {
-    const a = _.random(min, max);
-    if (!otherNums.includes(a)) otherNums.push(a);
-}
-
-console.log(">>> Numbers:", otherNums);
+console.log(">>> My numbers:", getNumbers(numCount, minNum, maxNum));
