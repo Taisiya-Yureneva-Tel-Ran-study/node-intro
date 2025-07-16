@@ -1,7 +1,10 @@
 # Node.js intro
 
-## HW #1 backend
+## HW #2 backend
 
-### Loto numbers generator.
-There are two solutions - one was suggested by the Copilot, and it looks really nice, so I could not resist.
-The other one is my solution, it might stuck a little if it's not used as a loto generator but, for example, as a shuffler. But I think it should not go to an infinite loop.
+### File parser
+File paths are defined in config. 
+
+Initial file is read using readFile, then parsed to separate code from comments.
+
+Code is written to codeFile and comments - to commentsFile.
