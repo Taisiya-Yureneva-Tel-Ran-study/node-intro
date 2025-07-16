@@ -1,58 +1,57 @@
-import _ from 'lodash';
+import config from "config";
+import { readFile, writeFile } from "node:fs/promises"
 
-let numCount: number = 7;
-let minNum: number = 1;
-let maxNum: number = 49;
-
-function checkArgs() {
-    if (argv.length > 2 && argv.length < 5) {
-        console.log("Invalid number of arguments. To use default values, run the script without arguments.\nTo use custom value specify 3 arguments: count, min value and max value.");
-        process.exit(1);
-    }
-
-    if (argv[2] && !Number.isNaN(Number(argv[2]))) numCount = Number(argv[2]);
-    if (argv[3] && !Number.isNaN(Number(argv[3]))) minNum = Number(argv[3]);
-    if (argv[4] && !Number.isNaN(Number(argv[4]))) maxNum = Number(argv[4]);
-
-    if (numCount < 1) {
-        console.log("Warning: count should be greater than 0\n");
-        process.exit(1);
-    }
-
-    if (minNum >= maxNum) {
-        console.log("Warning: min value should be less than max value\n");
-        process.exit(1);
-    }
-    if (numCount > maxNum - minNum + 1) {
-        console.log("Warning: cannot select", numCount, "unique numbers between", minNum, "and", maxNum, "\n");
-        process.exit(1);
-    }
+interface FilePaths {
+    initialFile: string;
+    codeFile: string;
+    commentFile: string;
 }
 
-function getNumbersFromAI(count: number, min: number, max: number): number[] {
-    let nums: number[] = _.range(min, max);
-    nums = _.shuffle(nums);
-    return nums.slice(0, count);
+function getPaths(): FilePaths {
+    return {
+        initialFile: config.get("files.initialFile"),
+        codeFile: config.get("files.codeFile"),
+        commentFile: config.get("files.commentsFile")
+    };
 }
 
-function getNumbers(count: number, min: number, max: number): number[] {
-    let nums: number[] = [];
+async function getText(file: string) : Promise<string> {
+    return await readFile(file, {encoding: "utf-8"});
+}
 
-    while (nums.length < count) {
-        const a = _.random(min, max);
-        if (!nums.includes(a)) nums.push(a);
+function parseText(text: string) {
+    const lines = text.split('\n');
+    const comments: string[] = [];
+    const code: string[] = [];
+
+    for (const line of lines) {
+        const commentStart = line.indexOf('//');
+
+        if (commentStart < 0) {
+            code.push(line);
+        } else if (commentStart === 0) {
+            comments.push(line);
+        } else {
+            code.push(line.slice(0, commentStart));
+            comments.push(line.slice(commentStart));
+        }
     }
-    return nums;
+
+    const codeString = code.join('\n');
+    const commentsString = comments.join('\n');
+
+    return { commentsString, codeString };
 }
 
-const argv = process.argv;
+async function writeToFile(file: string, text: string) {
+    await writeFile(file, text);
+}
 
-console.log("=== Loto numbers selector ===\n");
+const paths = getPaths();
 
-checkArgs();
+const text = await getText(paths.initialFile);
 
-console.log(">>> Draw ", numCount, " of ", maxNum - minNum + 1, "<<<\n");
+const parsed = parseText(text);
 
-console.log(">>> AI numbers:", getNumbersFromAI(numCount, minNum, maxNum), "<<<\n");
-
-console.log(">>> My numbers:", getNumbers(numCount, minNum, maxNum));
+await writeToFile(paths.codeFile, parsed.codeString).catch((err) => console.log(err));
+await writeToFile(paths.commentFile, parsed.commentsString).catch((err) => console.log(err));
