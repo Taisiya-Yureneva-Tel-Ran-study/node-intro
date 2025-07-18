@@ -14,7 +14,7 @@ export function isValidLogLevel(level: LogLevelString) {
 }
 
 class Logger extends EventEmitter {
-    logLevel: LogLevel;
+    private logLevel: LogLevel;
 
     constructor(logLevel: LogLevelString) {
         super();

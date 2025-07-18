@@ -5,12 +5,10 @@ import fs from "node:fs";
 const LOG_LEVEL_PARAM = "log_level";
 
 function getConfigParam(paramName: string) {
-    if (config.hasOwnProperty(paramName)) {
-        return config[paramName];
-    }
-    else {
+    if (!config.hasOwnProperty(paramName)) {
         throw new Error(`Config param '${paramName}' is not defined.`);
     }
+    return config[paramName];
 }
 
 let minLogLevel = "info" as LogLevelString;
