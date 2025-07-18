@@ -1,10 +1,10 @@
 # Node.js intro
 
-## HW #2 backend
+## HW #3 backend
 
-### File parser
-File paths are defined in config. 
+### Logger levels
+Logging level can be set in config.
 
-Initial file is read using readFile, then parsed to separate code from comments.
+The default level is `info`.
 
-Code is written to codeFile and comments - to commentsFile.
+Available levels are: `severe`, `warn`, `info`, `debug`

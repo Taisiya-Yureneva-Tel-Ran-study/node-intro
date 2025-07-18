@@ -1,7 +1,3 @@
 {
-    "files": {
-        "initialFile": "file.txt",
-        "codeFile": "code.txt",
-        "commentsFile": "comments.txt"
-    }
+    "log_level": "debug"
 }

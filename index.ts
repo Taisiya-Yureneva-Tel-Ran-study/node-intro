@@ -1,57 +1,36 @@
+import Logger, { isValidLogLevel, LogLevelString } from "./Logger.ts";
 import config from "config";
-import { readFile, writeFile } from "node:fs/promises"
+import fs from "node:fs";
 
-interface FilePaths {
-    initialFile: string;
-    codeFile: string;
-    commentFile: string;
-}
+const LOG_LEVEL_PARAM = "log_level";
 
-function getPaths(): FilePaths {
-    return {
-        initialFile: config.get("files.initialFile"),
-        codeFile: config.get("files.codeFile"),
-        commentFile: config.get("files.commentsFile")
-    };
-}
-
-async function getText(file: string) : Promise<string> {
-    return await readFile(file, {encoding: "utf-8"});
-}
-
-function parseText(text: string) {
-    const lines = text.split('\n');
-    const comments: string[] = [];
-    const code: string[] = [];
-
-    for (const line of lines) {
-        const commentStart = line.indexOf('//');
-
-        if (commentStart < 0) {
-            code.push(line);
-        } else if (commentStart === 0) {
-            comments.push(line);
-        } else {
-            code.push(line.slice(0, commentStart));
-            comments.push(line.slice(commentStart));
-        }
+function getConfigParam(paramName: string) {
+    if (config.hasOwnProperty(paramName)) {
+        return config[paramName];
     }
-
-    const codeString = code.join('\n');
-    const commentsString = comments.join('\n');
-
-    return { commentsString, codeString };
+    else {
+        throw new Error(`Config param '${paramName}' is not defined.`);
+    }
 }
 
-async function writeToFile(file: string, text: string) {
-    await writeFile(file, text);
+let minLogLevel = "info" as LogLevelString;
+
+try {
+    minLogLevel = getConfigParam(LOG_LEVEL_PARAM);
+    if (!isValidLogLevel( minLogLevel)) {
+        throw new Error(`Invalid log level '${minLogLevel}' in config.`);
+    }
+} catch (e) {
+    console.log(e.message, "Using default log level 'info'");
+    minLogLevel = "info";
 }
 
-const paths = getPaths();
+const logger = new Logger(minLogLevel);
 
-const text = await getText(paths.initialFile);
+logger.addHandlerMessage((obj) => console.log(obj.message));
+logger.addHandler("info", (message) => fs.writeFileSync("log.log", message + "\n", {"flag": "a"}))
 
-const parsed = parseText(text);
-
-await writeToFile(paths.codeFile, parsed.codeString).catch((err) => console.log(err));
-await writeToFile(paths.commentFile, parsed.commentsString).catch((err) => console.log(err));
+logger.log("debug", "string");
+logger.log("severe", "severe string");
+logger.log("warn", "warn string");
+logger.log("info", "info string");
