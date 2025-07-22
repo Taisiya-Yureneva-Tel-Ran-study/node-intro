@@ -1,12 +1,6 @@
-import { createReadStream } from "node:fs";
+import  CounterStream from "./CounterStream.ts";
 
-const stream = createReadStream("large_file", {encoding: "binary", highWaterMark: 1024* 1024});
-let len = 0;
+const cstream: CounterStream = new CounterStream(100);
 
-stream.on("data", chunk => {
-    len += chunk.length;
- //   console.log(len);
-});
-
-stream.on("end", () => {console.log(len)});
-stream.on("error", err => {console.log(err)});
+cstream.on("data", chunk => {console.log(chunk)});
+cstream.on("end", () => console.log("end"))

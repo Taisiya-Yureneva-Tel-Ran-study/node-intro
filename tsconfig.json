@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "module": "esnext",
+        "allowImportingTsExtensions": true,
+        "allowSyntheticDefaultImports": true,
+        "noEmit": true
+    }
+}
