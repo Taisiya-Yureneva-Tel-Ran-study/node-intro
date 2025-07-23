@@ -1,10 +1,14 @@
 # Node.js intro
 
-## HW #2 backend
+## HW #4 backend
 
-### File parser
-File paths are defined in config. 
+### Streaming random numbers
+RandomNumberStram takes parameters and streams random numbers to the listener.
 
-Initial file is read using readFile, then parsed to separate code from comments.
+Parameters can be defined in a config.
 
-Code is written to codeFile and comments - to commentsFile.
+The default values are:
+    "count": "7",
+    "min": "1",
+    "max": "49",
+    "unique": false
