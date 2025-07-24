@@ -1,6 +1,6 @@
 {
-    "count": "15",
+    "count": "7",
     "min": "1",
-    "max": "10",
-    "unique": true
+    "max": "49",
+    "unique": false
 }

@@ -18,7 +18,7 @@ export default class RandomNumberStream extends Readable {
     }
     
     private checkParameters() {
-        if ((this._unique && this._min > this._max - this._count) || 
+        if ((this._unique && this._min > this._max - this._count + 1) || 
                 this._min >= this._max) {
             console.log(`Invalid config parameters: cannot generate ${this._count} ${this._unique ? "unique" : ""} numbers between ${this._min} and ${this._max}`);
             console.log("Using defaults");
@@ -32,12 +32,17 @@ export default class RandomNumberStream extends Readable {
     }
 
     private generateNonUnique() {
-        return Array.from({length: this._count}, () => _.random(this._min, this._max));
+        return _.random(this._min, this._max);
     }
 
     private generateUnique() {
-        const ra = _.range(this._min, this._max+1);
-        return _.sampleSize(ra, this._count);
+        while (true) {
+            const num = _.random(this._min, this._max);
+            if (!this._generated.includes(num)) {
+                this._generated.push(num);
+                return num;
+            }
+        }
     }
 
     constructor(    private _count: number = COUNT_DEFAULT,
@@ -46,12 +51,12 @@ export default class RandomNumberStream extends Readable {
                     private _unique: boolean = UNIQUE_DEFAULT) {
         super();
         this.checkParameters();
-        this._generated = this._unique ?  this.generateUnique() : this.generateNonUnique();
     }
 
     _read(): void {
         if (this._counter < this._count) {
-            this.push(this._generated[this._counter]+"; ");
+            if (!this.push((this._unique ? this.generateUnique() : this.generateNonUnique()) + "; "))
+                return;
             this._counter++;
         } else {
             this.push(null);
