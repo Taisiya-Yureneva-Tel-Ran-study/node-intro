@@ -1,17 +1,22 @@
-import { Readable } from "node:stream";
+import { Transform } from "node:stream";
+import { TransformCallback } from "stream";
 
-export default class CounterStream extends Readable {
-    counter: number = 0;
-    constructor(private _max: number, options: any = {encoding: "utf-8"}) {
-        super(options);
-
+export default class CounterStream extends Transform {
+    private _counter: number = 0;
+    constructor(private _max: number) {
+        if (_max < 0) {
+            throw new Error(`CounterStream: count value must be positive, got ${_max}.`);
+        }
+        super({objectMode: true});
     }
-    _read(size: number): void {
-        if (this.counter >= this._max) {
-            this.push(null);
+
+    _transform(chunk: any, encoding: BufferEncoding, callback: TransformCallback): void {
+        if (this._counter < this._max) {
+            this.push(chunk);
+            this._counter++;
+            callback();
         } else {
-            this.push(this.counter+";");
-            this.counter++;
+            this.push(null);
         }
     }
 }
