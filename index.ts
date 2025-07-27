@@ -5,17 +5,11 @@ const port = 3501;
 
 server.listen(port, () => console.log(`Server started on port ${port}`));
 
-server.on("request", (req, res) => {
+server.on("request", async (req, res) => {
     res.statusCode = 200;
     let data = "";
-    req.on("data", (chunk) => {
-        console.log(chunk.toString());
+    for await (let chunk of req) {
         data += chunk;
-    })
-    req.on("end", () => {
-        console.log(data);
-        res.write(data);
-        res.end("\nHello World");
-    })
-//    res.write(JSON.stringify({method: req.method, url: req.url}));
+    }
+    res.end(data+"\nHello world!");
 })
