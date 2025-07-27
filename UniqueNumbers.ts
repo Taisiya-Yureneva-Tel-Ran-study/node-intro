@@ -1,5 +1,5 @@
 import { Transform } from "node:stream";
-import { TransformCallback } from "stream";
+import { TransformCallback } from "node:stream";
 
 export default class UniqueNumbers extends Transform {
     private _set: Set<number> = new Set();

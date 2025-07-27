@@ -1,5 +1,5 @@
 import { Transform } from "node:stream";
-import { TransformCallback } from "stream";
+import { TransformCallback } from "node:stream";
 
 export default class CounterStream extends Transform {
     private _counter: number = 0;
@@ -14,9 +14,9 @@ export default class CounterStream extends Transform {
         if (this._counter < this._max) {
             this.push(chunk);
             this._counter++;
-            callback();
-        } else {
+        } else{
             this.push(null);
         }
+        callback();
     }
 }
