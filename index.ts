@@ -1,23 +1,21 @@
-import { pipeline } from "node:stream/promises";
-import { getParameters } from "./GetStreamParameters.ts";
-import RandomNumberStream from "./RandomNumberStream.ts";
-import UniqueNumbers from "./UniqueNumbers.ts";
-import CounterStream from "./CounterStream.ts";
-import OutputStream from "./OutputStream.ts";
+import http from "node:http";
 
-async function showNums(min: number, max: number, count: number): Promise<void> {
-    await pipeline(
-        new RandomNumberStream(min, max),
-        new UniqueNumbers(),
-        new CounterStream(count),
-        new OutputStream()
-    );
-}
+const server = http.createServer();
+const port = 3501;
 
-try {
-    const {min, max, count} = getParameters();
+server.listen(port, () => console.log(`Server started on port ${port}`));
 
-    await showNums(min, max, count);
-} catch (err) { 
-    console.log(err.message, "Exiting...");
-}
+server.on("request", (req, res) => {
+    res.statusCode = 200;
+    let data = "";
+    req.on("data", (chunk) => {
+        console.log(chunk.toString());
+        data += chunk;
+    })
+    req.on("end", () => {
+        console.log(data);
+        res.write(data);
+        res.end("\nHello World");
+    })
+//    res.write(JSON.stringify({method: req.method, url: req.url}));
+})
