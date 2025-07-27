@@ -1,19 +1,65 @@
-import { createWriteStream } from "node:fs";
+import { Readable, Writable, Transform } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import { TransformCallback } from "stream";
 
-const writeStream = createWriteStream("test.txt", {"highWaterMark": 1024*1024});
-let index = 0;
-const max = 1000000;
-function write () {
-    let canWrite = true;
-    while (canWrite && index < max)
-    {
-        canWrite = writeStream.write("Hello".repeat(1000));
-        index += 5;
+class NumberClass extends Readable {
+    private _counter = 0;
+    constructor() {
+        super({objectMode: true});
     }
-    if (index < max)
-    {
-        writeStream.once("drain", write);
+
+    _read () {
+        this.push(this._counter++);
     }
 }
 
-write();
+class EvenNUmbers extends Transform {
+    constructor() {
+        super({objectMode: true});
+    }
+
+    _transform(chunk: any, encoding: BufferEncoding, callback: TransformCallback): void {
+        if (chunk % 2 === 0) {
+            this.push(chunk);
+        }
+        callback();
+    }
+}
+
+class Limit extends Transform {
+    private _counter = 0;
+    constructor(private _limit: number) {
+        super({objectMode: true});
+    }
+    _transform(chunk: any, encoding: BufferEncoding, callback: TransformCallback): void {
+        if (this._counter < this._limit) {
+            this.push(chunk);
+            this._counter++;
+            callback();
+        } else {
+            this.push(null);
+        }
+    }
+}
+
+class OutputStream extends Writable {
+    constructor() {
+        super({objectMode: true});
+    }
+    _write(chunk: any, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
+        console.log(chunk + "; ");
+        callback();
+    }
+
+}
+
+async function displayEvenNumbers(count: number): Promise<void> {
+    await pipeline(
+        new NumberClass(),
+        new EvenNUmbers(),
+        new Limit(count),
+        new OutputStream()
+    )
+}
+
+displayEvenNumbers(20).catch((err) => console.log(err.message));
