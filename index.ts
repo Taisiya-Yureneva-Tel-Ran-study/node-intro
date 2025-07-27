@@ -1,16 +1,19 @@
-import { getParameters } from "./GetStreamParameters.ts";
-import RandomNumberStream from "./RandomNumberStream.ts";
+import { createWriteStream } from "node:fs";
 
-const {count, min, max, unique} = getParameters();
+const writeStream = createWriteStream("test.txt", {"highWaterMark": 1024*1024});
+let index = 0;
+const max = 1000000;
+function write () {
+    let canWrite = true;
+    while (canWrite && index < max)
+    {
+        canWrite = writeStream.write("Hello".repeat(1000));
+        index += 5;
+    }
+    if (index < max)
+    {
+        writeStream.once("drain", write);
+    }
+}
 
-const rns = new RandomNumberStream(count, min, max, unique);
-
-rns.pipe(process.stdout);
-rns.on("end", () => {
-    process.stdout.write("\nend emitted", 
-    // We seem to have to use the callback here to be sure 
-    // that all the data is written to the stdout before the process exits
-    // (specifically when count in small)
-        () => console.log("\nNow it should end correctly. Bye!"));
-});
-
+write();
