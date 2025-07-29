@@ -5,9 +5,9 @@
   "license": "ISC",
   "author": "Yurta",
   "type": "module",
-  "main": "index.ts",
+  "main": "src/controller/index.ts",
   "scripts": {
-    "dev": "node --no-warnings --loader ts-node/esm index.ts",
+    "dev": "node --no-warnings --loader ts-node/esm src/controller/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
