@@ -1,47 +1,31 @@
-type Operation = "+" | "-" | "*" | "/";
-const operationDef: {[level in Operation]: number} = {
-    '+': 0,
-    '-': 1,
-    '*': 2,
-    '/': 3
+const operationDef: Record<string, (a: number, b: number) => number> = {
+    '+': (a, b) => a + b,
+    '-': (a, b) => a - b,
+    '*': (a, b) => a * b,
+    '/': (a, b) => {
+        if (b === 0) {
+            throw new Error("Division by zero is generally allowed, but let's not call the infinity");
+        } else return a / b}
 };
+
 const MAX_VALUE = 100000000;
 
-function isValidOperation(op: Operation) {
-    if (!(op in operationDef))
-        throw new Error(`Operation '${op}' is not valid`);
-}
-
-function numberIsNotTooSmall(a: number) {
+function checkParameters(a: number, b: number) {
     if (a < MAX_VALUE * (-1))
         throw new Error(`${a} is too small, I'm not sure I can process numbers less than ${MAX_VALUE * (-1)} correctly`); 
-}
-function numberIsNotTooBig(a: number) {
     if (a > MAX_VALUE )
         throw new Error(`${a} is too big, I'm not sure I can process numbers greater than ${MAX_VALUE} correctly`); 
-}
-
-function checkParameters(operation: string, a: number, b: number) {
-    isValidOperation(operation as Operation);
-    numberIsNotTooSmall(a);
-    numberIsNotTooSmall(b);
-    numberIsNotTooBig(a);
-    numberIsNotTooBig(b);
+    if (b < MAX_VALUE * (-1))
+        throw new Error(`${b} is too small, I'm not sure I can process numbers less than ${MAX_VALUE * (-1)} correctly`); 
+    if (b > MAX_VALUE )
+        throw new Error(`${b} is too big, I'm not sure I can process numbers greater than ${MAX_VALUE} correctly`); 
 }
 
 export default function compute (operation: string, a: number, b: number ) {
-    checkParameters(operation, a, b);
-    
-    switch (operation) {
-        case '+': return a + b;
-        case '-': return a - b;
-        case '*': return a * b;
-        case '/': {
-            if (b === 0) {
-                throw new Error("Division by zero is generally allowed, but let's not call the infinity");
-            }
-            return a / b;
-        }
-    }
+    checkParameters(a, b);
 
+    const opFunc = operationDef[operation];
+    if (!opFunc) throw new Error(`Operation '${operation}' is not supported`);
+
+    return opFunc(a, b);
 }

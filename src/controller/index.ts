@@ -1,6 +1,15 @@
 import http from "node:http";
 import compute from "../service/compute.ts";
-import { checkRequestData, formatResult } from "../utils/utils.ts";
+
+function formatResult(first: number, second: number, op: string, res: number) {
+    return first + " " + op + " " + second + " = " + res.toString();
+}
+
+function checkRequestData(operation: string, first: number, second: number) {
+    if ((typeof operation !== "string") || (typeof first !== "number") ||
+        (typeof second !== "number"))
+        throw new Error("Request data is not valid, check that operation is string and first and second are numbers")
+}
 
 const server = http.createServer();
 const port = 3501;
