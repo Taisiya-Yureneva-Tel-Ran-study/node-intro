@@ -1,8 +1,8 @@
 const operationDef: Record<string, (a: number, b: number) => number> = {
-    '+': (a, b) => a + b,
-    '-': (a, b) => a - b,
-    '*': (a, b) => a * b,
-    '/': (a, b) => {
+    'add': (a, b) => a + b,
+    'sub': (a, b) => a - b,
+    'mul': (a, b) => a * b,
+    'div': (a, b) => {
         if (b === 0) {
             throw new Error("Division by zero is generally allowed, but let's not call the infinity");
         } else return a / b}
