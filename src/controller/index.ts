@@ -1,4 +1,4 @@
-import express, {Request, Response} from "express";
+import express, {Request} from "express";
 import { requestTime } from "../middleware/requestTime.ts";
 import rateLimit from "../../node_modules/express-rate-limit/dist/index.cjs";
 
