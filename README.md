@@ -1,10 +1,12 @@
 # Node.js intro
 
-## HW #6 backend
+## HW #7 backend
 
-### Calculator on HTTP server
+### Express middleware
 #### Protocol
-- JSON inside request containing:
-    - operation like "*", "-", "+", "/"
-    - first operand as a number
-    - second operand as a number
+- POST api/greet 
+    - returns JSON with a greeting and request time
+    - does not allow more than 3 requests per minute
+- GET api/status
+    - returns JSON with server status and request time
+    - allows as many requests as needed
