@@ -1,22 +1,18 @@
 import { NextFunction, Request, Response } from "express";
 import _ from "lodash";
-import z from "zod";
+import { ZodType } from "zod";
 
-const CalculationDataSchema = z.object({
-    operation: z.string(),
-    first: z.coerce.number(),
-    second: z.coerce.number()
-})
-
-export function validation(req: Request & { error: Error }, res: Response, next: NextFunction) {
+export function validation(schema: ZodType<any, any, any>): 
+    (req: Request & { error: Error }, res: Response, next: NextFunction) => void {
+    return (req: Request & { error: Error }, __: Response, next: NextFunction) => {
     let obj: any = req.body;
     if (!obj || _.isEmpty(obj)) {
         obj = !req.params || _.isEmpty(req.params) ? req.query : req.params; 
     }
 
     if (!_.isEmpty(obj)) {
-        req.body = CalculationDataSchema.parse(obj);
+        req.body = schema.parse(obj);
     }
 
     next();
-}
+}}
