@@ -1,3 +1,4 @@
 node_modules
 large_file
 test.txt
+.env
